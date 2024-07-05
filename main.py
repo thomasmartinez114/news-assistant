@@ -124,6 +124,15 @@ class AssistantManager:
                 role=role,
                 content=content
             )
+    
+    # === Run assistant === #
+    def run_assistant(self, instructions):
+        if self.thread and self.assistant:
+            self.run = self.client.beta.threads.runs.create(
+                thread_id=self.thread.id,
+                assistant_id=self.assistant.id,
+                instructions=instructions
+            )
 
 if __name__ == "__main__":
     main()
