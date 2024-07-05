@@ -70,7 +70,40 @@ def get_news(topic):
 
 def main():
     news = get_news("bitcoin")
-    print(news)
+    print(news[0])
+
+class AssistantManager:
+    thread_id = None
+    assistant_id = None
+
+    def __init__(self, model: str = model):
+        self.client = client
+        self.model = model
+        self.assistant = None,
+        self.thread = None,
+        self.run = None
+        self.summary = None
+        
+        # Retrieving exisiting assistant and thread if IDs are already set
+        if AssistantManager.assistant_id:
+            self.assistant = self.client.beta.assistants.retrieve(
+                assistant_id=AssistantManager.assistant_id
+            )
+        
+        if AssistantManager.thread_id:
+            self.thread = self.client.beta.threads.retrieve(
+                thread_id=AssistantManager.thread_id
+            )
+
+    # Create Assistant   
+    def create_assistant(self, name, instructions, tools):
+        if not self.assistant:
+            assistant_obj = self.client.beta.assistants.create(
+                name=name,
+                instructions=instructions,
+                tools=tools
+                model=self.model
+            )
 
 if __name__ == "__main__":
     main()
