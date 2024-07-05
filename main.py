@@ -8,6 +8,12 @@ import requests
 import json
 
 load_dotenv()
+# openai.api_key = os.environ.get("OPENAI_API_KEY")
+# defaults to getting the key using os.environ.get("OPENAI_API_KEY")
+# if you saved the key under a different environment variable name, you can do something like:
+# client = OpenAI(
+#   api_key=os.environ.get("CUSTOM_ENV_NAME"),
+# )
 
 # news api
 news_api_key = os.environ.get("NEWS_API_KEY")
@@ -19,7 +25,7 @@ model = 'gpt-3.5-turbo-1106'
 
 def get_news(topic):
     url = (
-        f"https://newsapi.org/v2/everything?={topic}&apiKey={news_api_key}&pageSize=5"
+        f"https://newsapi.org/v2/everything?q={topic}&apiKey={news_api_key}&pageSize=5"
     )
 
     try:
