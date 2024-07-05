@@ -95,7 +95,7 @@ class AssistantManager:
                 thread_id=AssistantManager.thread_id
             )
 
-    # Create Assistant   
+    # === Create Assistant === #
     def create_assistant(self, name, instructions, tools):
         if not self.assistant:
             assistant_obj = self.client.beta.assistants.create(
@@ -104,6 +104,17 @@ class AssistantManager:
                 tools=tools
                 model=self.model
             )
+            AssistantManager.assistant_id = assistant_obj.id
+            self.assistant = assistant_obj
+            print(f"AssisID::::: {self.assistant.id}")
+
+    # === Create Thread === #
+    def create_thread(self):
+        if not self.thread:
+            thread_obj = self.client.beta.threads.create()
+            AssistantManager.thread_id = thread_obj.id
+            self.thread = thread_obj
+            print(f"ThreadID::::: {self.thread.id}")
 
 if __name__ == "__main__":
     main()
