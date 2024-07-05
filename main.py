@@ -66,8 +66,6 @@ def get_news(topic):
     except requests.exceptions.RequestException as e:
         print("Error occurred during API Request", e)
 
-
-
 def main():
     news = get_news("bitcoin")
     print(news[0])
@@ -155,6 +153,57 @@ class AssistantManager:
             #     role = msg.role
             #     content = msg.content[0].text.value
             #     print(f"SUMMARY--------> {role.capitalize()}: ==> {content}")
+
+    # === Call Required Functions ===#
+    def call_required_functions(self, required_actions):
+        if not self.run:
+            return
+        tool_outputs = []
+
+        for action in required_actions["tool_calls"]:
+            func_name = action["function"]["name"]
+            arguments = json.loads(action["function"]["arguments"])
+
+            if func_name == "get_news":
+                output = get_news(topic=arguments["topic"])
+                print(f"STUFF:::::::{output}")
+                final_str = ""
+                for item in output:
+                    final_str += "".join(item)
+
+                tool_outputs.append({"tool_call_id": action["id"],
+                                     "output": final_str})
+                
+            else:
+                raise ValueError(f"Unknown function: {func_name}")
+                
+            print("Submitting outputs back to the Assistant....")
+            self.client.beta.threads.runs.submit_tool_outputs(
+                thread_id=self.thread.id,
+                run_id=self.run.id,
+                tool_outputs=tool_outputs
+            )
+
+
+    # === Wait for Completed === #
+    def wait_for_completed(self):
+        if self.thread and self.run:
+            while True:
+                time.sleep(5)
+                run_status = self.client.beta.threads.runs.retrieve(
+                    thread_id=self.thread.id,
+                    run_id=self.run.id
+                )
+                print(f"RUN STATUS:: {run_status.model_dump_json(indent=4)}")
+
+                if run_status.status == "completed":
+                    self.process_message()
+                    break
+                elif run_status.status == "requires_action":
+                    print("FUNCTION CALLING NOW...")
+                    self.call_required_functions(
+                        required_actions=run_status.required_action.submit_tool_outputs.model_dump()
+                    )
         
 
 if __name__ == "__main__":
