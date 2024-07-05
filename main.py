@@ -133,6 +133,29 @@ class AssistantManager:
                 assistant_id=self.assistant.id,
                 instructions=instructions
             )
+    
+    # === Processing the message === #
+    def process_message(self):
+        if self.thread:
+            messages = self.client.beta.threads.messages.list(
+                thread_id=self.thread.id
+            )
+            summary = []
+
+            last_message = messages.data[0]
+            role = last_message.role
+            response = last_message.content[0].text.value
+            summary.append(response)
+
+            self.summary = "\n".join(summary)
+            print(f"SUMMARY--------> {role.capitalize()}: ==> {response}")
+
+            # could have looped through like below
+            # for msg in messages:
+            #     role = msg.role
+            #     content = msg.content[0].text.value
+            #     print(f"SUMMARY--------> {role.capitalize()}: ==> {content}")
+        
 
 if __name__ == "__main__":
     main()
