@@ -6,6 +6,7 @@ import logging
 from datetime import datetime
 import requests
 import json
+import streamlit as st
 
 load_dotenv()
 # openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -95,7 +96,7 @@ class AssistantManager:
             assistant_obj = self.client.beta.assistants.create(
                 name=name,
                 instructions=instructions,
-                tools=tools
+                tools=tools,
                 model=self.model
             )
             AssistantManager.assistant_id = assistant_obj.id
@@ -216,8 +217,17 @@ class AssistantManager:
 
 
 def main():
-    news = get_news("bitcoin")
-    print(news[0])
+    # news = get_news("bitcoin")
+    # print(news[0])
+
+    manager = AssistantManager()
+
+    # === Streamlit Interface === #
+    st.title("News Summarizer")
+
+    with st.form(key="user_input_form"):
+        instructions = st.text_input("Enter topic:")
+        submit_button = st.form_submit_button(label="Run Assistant")
 
 if __name__ == "__main__":
     main()
