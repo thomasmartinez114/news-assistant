@@ -184,7 +184,7 @@ class AssistantManager:
                 tool_outputs=tool_outputs
             )
 
-    # == for Streamlit == #
+    # === for Streamlit === #
     def get_summary(self):
         return self.summary
 
@@ -207,6 +207,15 @@ class AssistantManager:
                     self.call_required_functions(
                         required_actions=run_status.required_action.submit_tool_outputs.model_dump()
                     )
+
+    
+    # === Run the steps === #
+    def run_steps(self):
+        run_steps = self.client.beta.threads.runs.steps.list(
+            thread_id=self.thread.id,
+            run_id=self.run.id
+        )
+        print(f"Run-Steps::: {run_steps}")
         
 
 if __name__ == "__main__":
