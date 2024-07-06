@@ -66,10 +66,6 @@ def get_news(topic):
     except requests.exceptions.RequestException as e:
         print("Error occurred during API Request", e)
 
-def main():
-    news = get_news("bitcoin")
-    print(news[0])
-
 class AssistantManager:
     thread_id = None
     assistant_id = None
@@ -216,7 +212,12 @@ class AssistantManager:
             run_id=self.run.id
         )
         print(f"Run-Steps::: {run_steps}")
-        
+
+
+
+def main():
+    news = get_news("bitcoin")
+    print(news[0])
 
 if __name__ == "__main__":
     main()
