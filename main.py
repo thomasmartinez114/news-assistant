@@ -68,14 +68,14 @@ def get_news(topic):
         print("Error occurred during API Request", e)
 
 class AssistantManager:
-    thread_id = None
-    assistant_id = None
+    thread_id = "thread_S4ZoIFczYGwl7nl64Vv1bQxS"
+    assistant_id = "asst_ErxNalEsqmIQDYdwf7FSQrNP"
 
     def __init__(self, model: str = model):
         self.client = client
         self.model = model
-        self.assistant = None,
-        self.thread = None,
+        self.assistant = None
+        self.thread = None
         self.run = None
         self.summary = None
         
@@ -186,7 +186,7 @@ class AssistantManager:
         return self.summary
 
     # === Wait for Completed === #
-    def wait_for_completed(self):
+    def wait_for_completion(self):
         if self.thread and self.run:
             while True:
                 time.sleep(5)
@@ -213,6 +213,7 @@ class AssistantManager:
             run_id=self.run.id
         )
         print(f"Run-Steps::: {run_steps}")
+        return run_steps.data
 
 
 
@@ -228,6 +229,51 @@ def main():
     with st.form(key="user_input_form"):
         instructions = st.text_input("Enter topic:")
         submit_button = st.form_submit_button(label="Run Assistant")
+
+        # handle submit button
+        if submit_button:
+            manager.create_assistant(
+                name="News Summarizer",
+                instructions="You are a personal article summarizer Assistant who knows how to take a list of article's titles and descriptions and then write a short summary of all the news articles",
+                tools=[
+                     {
+                        "type": "function",
+                        "function": {
+                            "name": "get_news",
+                            "description": "Get the list of articles/news for the given topic",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "topic": {
+                                        "type": "string",
+                                        "description": "The topic for the news, e.g. bitcoin",
+                                    }
+                                },
+                                "required": ["topic"],
+                            },
+                        },
+                    }
+                ]
+            )
+            manager.create_thread()
+
+            # Add the message and run the assistant
+            manager.add_message_to_thread(
+                role="user",
+                content=f"summarize the news on this topic {instructions}"
+            )
+            manager.run_assistant(instructions="Summarize the news")
+
+            # Wait for completions and process messages
+            manager.wait_for_completion()
+
+            summary = manager.get_summary()
+
+            st.write(summary)
+
+            ## Uncomment when want to see the Assistants steps on UI
+            #st.text("Run Steps:")
+            #st.code(manager.run_steps(), line_numbers=True)
 
 if __name__ == "__main__":
     main()
