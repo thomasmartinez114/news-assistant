@@ -184,6 +184,9 @@ class AssistantManager:
                 tool_outputs=tool_outputs
             )
 
+    # == for Streamlit == #
+    def get_summary(self):
+        return self.summary
 
     # === Wait for Completed === #
     def wait_for_completed(self):
